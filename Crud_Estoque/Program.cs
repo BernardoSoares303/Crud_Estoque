@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using Mysqlx.Prepare;
 
 namespace Crud_Estoque
 {
@@ -23,6 +24,8 @@ namespace Crud_Estoque
         static void Main(string[] args)
         {
             int opcao = 0;
+            int id_produto;
+            int opcao2 = 0;
             
             produto p = new produto();
 
@@ -68,6 +71,47 @@ namespace Crud_Estoque
                         inserirdados(p);
 
                         break;
+
+                    case 2:
+                        break;
+                    case 3:
+                        Console.Clear();
+                        Console.WriteLine("==================");
+                        Console.WriteLine("| Apagar Produto |");
+                        Console.WriteLine("==================");
+
+                        Console.WriteLine();
+                        Console.Write("Insira o id do produto que deseja remover: ");
+                        id_produto = int.Parse(Console.ReadLine());
+
+                        excluirprodutos(id_produto);
+
+                        Console.WriteLine("Pressione qualquer tecla para continuar...");
+                        Console.ReadKey(true);
+
+                        break;
+                    case 4:
+                        Console.WriteLine("===================");
+                        Console.WriteLine("| Opções de Busca |");
+                        Console.WriteLine("===================");
+                        Console.WriteLine("| 1. Categoria    |");
+                        Console.WriteLine("| 2. Nome         |");
+                        Console.WriteLine("| 3. Sair         |");
+                        Console.WriteLine("===================");
+
+                        Console.Write("Escolha uma das opções acima: ");
+                        opcao2 = int.Parse(Console.ReadLine());
+
+
+
+                        switch (opcao2)
+                        {
+                            case 1:
+
+                                break;
+                        }
+
+                        break;
                 }
 
             } while (opcao !=5); 
@@ -93,6 +137,28 @@ namespace Crud_Estoque
                 }
 
             } catch(Exception ex)
+            {
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+        }
+
+        static public void excluirprodutos(int id)
+        {
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(conexao))
+                {
+                    con.Open();
+
+                    string delete = $@"delete  from produto where id_produto ={id};";
+
+                    MySqlCommand cmd = new MySqlCommand(delete, con);
+                    cmd.ExecuteNonQuery();
+                    Console.WriteLine("Produto Apagado Com Sucesso!");
+                    con.Close();
+                }
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine($"Erro: {ex.Message}");
             }
