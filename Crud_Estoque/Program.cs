@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,9 @@ namespace Crud_Estoque
             int opcao = 0;
             int id_produto;
             int opcao2 = 0;
-            
+            string tipo;
+            string palavra;
+
             produto p = new produto();
 
             do{
@@ -70,6 +73,9 @@ namespace Crud_Estoque
 
                         inserirdados(p);
 
+                        Console.WriteLine("Prexione qualquer tecla para prosseguir...");
+                        Console.ReadKey(true);
+
                         break;
 
                     case 2:
@@ -91,6 +97,7 @@ namespace Crud_Estoque
 
                         break;
                     case 4:
+                        Console.Clear();
                         Console.WriteLine("===================");
                         Console.WriteLine("| Opções de Busca |");
                         Console.WriteLine("===================");
@@ -107,10 +114,36 @@ namespace Crud_Estoque
                         switch (opcao2)
                         {
                             case 1:
+                                tipo = "categoria";
+                                Console.Write("Insira a categoria que deseja buscar: ");
+                                palavra = Console.ReadLine();
 
+                                Console.Clear();
+                                mostrarprodutos(tipo, palavra);
+                                break;
+                            case 2:
+                                tipo = "nome";
+                                Console.Write("Insira o nome do produto que deseja buscar: ");
+                                palavra = Console.ReadLine();
+
+                                Console.Clear();
+
+                                mostrarprodutos(tipo, palavra);
+                                break;
+                            case 3:
+                                break;
+                            default:
+                                Console.WriteLine("Opção Invalida!");
                                 break;
                         }
 
+                        Console.WriteLine("Prexione qualquer tecla para proseguir...");
+                        Console.ReadKey(true);
+
+                        break;
+
+                    default:
+                        Console.WriteLine("Opção Invalida!");
                         break;
                 }
 
@@ -119,6 +152,12 @@ namespace Crud_Estoque
 
         static public void inserirdados(produto p)
         {
+            if (string.IsNullOrWhiteSpace(p.nome))
+            {
+                Console.WriteLine("Erro: O nome do produto não pode estar vazio.");
+                return;
+            }
+
             try
             {
                 using (MySqlConnection con = new MySqlConnection(conexao))
@@ -162,6 +201,32 @@ namespace Crud_Estoque
             {
                 Console.WriteLine($"Erro: {ex.Message}");
             }
+        }
+
+        static public void mostrarprodutos(string tipo, string palavra)
+        {
+            using (MySqlConnection con = new MySqlConnection(conexao))
+            {
+                con.Open();
+
+                string queryselct = $@"select * from produto where {tipo} like '%{palavra}%';";
+
+                MySqlCommand cmd = new MySqlCommand(queryselct, con);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                Console.WriteLine("Produtos Encontrados:");
+                while (reader.Read())
+                {
+                    Console.WriteLine($"Id: {reader["id_produto"]}");
+                    Console.WriteLine($"Nome: {reader["nome"]}");
+                    Console.WriteLine($"Quantidade: {reader["quantidade"]}");
+                    Console.WriteLine($"Preço: {reader["preco"]}");
+                    Console.WriteLine($"Categoria: {reader["categoria"]}");
+                    Console.WriteLine("------------------------------------------");
+                }
+
+            }
+
         }
     }
 }
